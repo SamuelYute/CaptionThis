@@ -1,0 +1,30 @@
+#auth-wrapper{
+  background-color: #333;
+  height:100%
+}
+
+.w3-black-opacity{
+  background:#7f7f7f!important;
+  background:rgba(0,0,0,0.5)!important;
+  color: white!important
+}
+
+.btn-facebook{
+  background-color: #3b5998!important;
+  border-color: #3b5998!important;
+}
+
+.btn-google{
+  background-color: #d62d20!important;
+  border-color: #d62d20!important;
+}
+
+.btn-twitter{
+  background-color: #00aced!important;
+  background-color: #00aced!important;
+}
+
+.btn-facebook:hover.btn-google:hover.btn-twitter:hover{
+  background:#7f7f7f!important;
+  background:rgba(0,0,0,0.5)!important;
+}

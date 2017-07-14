@@ -1,0 +1,36 @@
+.home-bg-cover{
+    /* The image used */
+    background-color: white!important;
+    /*background-image: url('/images/art.jpg')!important;*/
+
+    /* Full height */
+    height: 100%!important;
+
+    /* Center and scale the image nicely */
+    background-position: center!important;
+    background-repeat: no-repeat!important;
+    background-size: cover!important;
+}
+
+.navbar-transparent{
+    background-color:white;
+    color:#333;
+}
+
+.nav-link.active{
+    border-radius:1px;
+    background-color: #60e9ff!important;
+    font-size:20px;
+
+    -webkit-transition: font-size 150ms; /* Safari */
+    transition: font-size 150ms;
+}
+
+.navbar-brand{
+    color: #60e9ff!important;
+    font-size:23px;
+}
+
+.navbar-nav > .active{
+    border-bottom: 2px solid #333;
+}

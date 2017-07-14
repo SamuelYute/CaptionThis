@@ -1,0 +1,22 @@
+.navbar-transparent{
+    background-color:white;
+    color:#333;
+}
+
+.nav-link.active{
+    border-radius:1px;
+    background-color: #60e9ff!important;
+    font-size:20px;
+
+    -webkit-transition: font-size 150ms; /* Safari */
+    transition: font-size 150ms;
+}
+
+.navbar-brand{
+    color: #60e9ff!important;
+    font-size:23px;
+}
+
+.navbar-nav > .active{
+    border-bottom: 2px solid #333;
+}
