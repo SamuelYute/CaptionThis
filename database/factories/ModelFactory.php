@@ -22,3 +22,22 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'remember_token' => str_random(10),
     ];
 });
+
+$factory->define(App\Picture::class, function (Faker\Generator $faker) {
+    return [
+        'path' => '/default',
+        'url' => $faker->imageUrl(500,400),
+        'user_id' => function () {
+            return \App\User::first()->id;
+        }
+    ];
+});
+
+$factory->define(App\Caption::class, function (Faker\Generator $faker) {
+    return [
+        'content' => $faker->realText(150, 2),
+        'user_id' => function () {
+            return \App\User::first()->id;
+        }
+    ];
+});

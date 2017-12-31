@@ -64,11 +64,9 @@ class UsersController extends Controller
             $user->password = bcrypt($request['password']);
             $user->save();
 
-            flash('Success! Password changed.', 'success');
+            return response('Success!',200);
         } else {
-            flash('Error! Your old password is wrong, try again', 'danger');
+            return response('Error! Old Password Wrong',401);
         }
-
-        return redirect()->back();
     }
 }

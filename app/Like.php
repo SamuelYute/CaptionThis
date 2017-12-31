@@ -7,11 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Like extends Model
 {
     //
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo('App\User');
     }
 
-    public function picture(){
+    public function picture()
+    {
         return $this->belongsTo('App\Picture');
+    }
+
+    public function likable()
+    {
+        return $this->morphTo();
     }
 }

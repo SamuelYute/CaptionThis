@@ -2,51 +2,82 @@
 
 namespace App\Http\Controllers;
 
-use function foo\func;
+use App\Reply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Picture;
-use App\Category;
 use App\Like;
 use Illuminate\Support\Facades\URL;
 
 class PicturesController extends Controller
 {
-    //
-    public function store(Request $request){
+
+    public function getPicture(Picture $picture)
+    {
+        $responseMsg = "Success! Picture Found.";
+
+        return response()->json([
+            "message"=>$responseMsg,
+            "data"=>$picture],200);
+    }
+
+    public function getAllPictures()
+    {
+        $pictures = Picture::all();
+        if ($pictures->count() < 1)
+            $responseMsg = "Warning! Pictures not Found.";
+        else
+            $responseMsg = "Success! Pictures Found.";
+
+        return response()->json([
+            "message"=>$responseMsg,
+            "data"=>$pictures],200);
+    }
+
+    public function getPictureReplies(Picture $picture)
+    {
+        $replies = $picture->replies;
+        if ($replies->count() < 1)
+            $responseMsg = "Warning! Pictures Replies not Found.";
+        else
+            $responseMsg = "Success! Pictures Replies Found.";
+
+        return response()->json([
+            "message"=>$responseMsg,
+            "data"=>$replies],200);
+    }
+
+    public function getPictureCaptions(Picture $picture)
+    {
+        $captions = $picture->captions;
+        if ($captions->count() < 1)
+            $responseMsg = "Warning! Pictures Captions not Found.";
+        else
+            $responseMsg = "Success! Pictures Captions Found.";
+
+        return response()->json([
+            "message"=>$responseMsg,
+            "data"=>$captions],200);
+
+    }
+
+    public function store(Request $request)
+    {
         $this->validate($request, [
-          'caption' => 'max:190|string',
           'picture' => 'required|image',
-          'category' => 'required|max:3',
         ]);
 
-        $user = Auth::user();
-        $category = Category::find($request['category']);
+        $user = $request->user();
 
         $picture = new Picture;
 
-        $picture->caption = $request['caption'];
-        $picture->linked_caption = $picture->caption;
-        $picture->type = "Random";
-        $picture->views = 0;
-        $picture->downloads = 0;
-
-        $hashTags = $this->getHashTags($picture->caption);
-        
-        if ($hashTags) {
-            $picture->hash_tags = $hashTags;
-            $picture->linked_caption = $this->makeHashTagLinks($picture->caption);
-        }
-
         $image = $request->file('picture');
-        $lowResolution = time() . '-low-resolution-' . $category->slug . '.' . $image->getClientOriginalExtension();
-        $highResolution = time() . '-high-resolution-' . $category->slug . '.' . $image->getClientOriginalExtension();
+        $pictureName = time().'_'.$user->username.'.'.$image->getClientOriginalExtension();
 
-        $pictureCategoryFolder = storage_path().'/app/public/pictures/'. $category->slug;
-        $pictureDBPath = '/pictures/'.$category->slug.'/';
+        $pictureCategoryFolder = storage_path().'/app/public/pictures/';
+        $pictureDBPath = '/pictures/';
 
         if (!File::exists($pictureCategoryFolder)) {
             File::makeDirectory($pictureCategoryFolder);
@@ -57,78 +88,72 @@ class PicturesController extends Controller
               $constraint->aspectRatio();
           })
             ->orientate()
-            ->save($pictureCategoryFolder.'/'.$lowResolution);
-        Image::make($image)
-            ->orientate()
-            ->save($pictureCategoryFolder.'/'.$highResolution);
+            ->save($pictureCategoryFolder.'/'.$pictureName);
 
-        $picture->low_resolution = $pictureDBPath.$lowResolution;
-        $picture->high_resolution = $pictureDBPath.$highResolution;
-
-        $picture->category()->associate($category);
+        $picture->path = $pictureDBPath.$pictureName;
         $picture->user()->associate($user);
 
         $picture->save();
 
-        flash('Success! Picture added.','success');
-        return redirect()->back();
+        $responseMsg = 'Success! Picture Stored.';
+        return response()->json([
+            "message"=>$responseMsg,
+            "data"=>$picture],200);
     }
 
-    public function update(Request $request, $id){
-        $this->validate($request, [
-            'caption' => 'max:190|string',
-            'category' => 'required|max:3',
-        ]);
+    public function delete(Picture $picture)
+    {
+        $picture->delete();
 
-        $user = Auth::user();
-        $category = Category::find($request['category']);
-
-        $picture = Picture::find($id);
-        if(!$picture){
-            flash('Error! Picture not found.','danger');
-            return redirect()->back();
-        }
-
-        $picture->caption = $request['caption'];
-        $picture->linked_caption = $picture->caption ;
-
-        $hashTags = $this->getHashTags($picture->caption);
-
-        if ($hashTags) {
-            $picture->hash_tags = $hashTags;
-            $picture->linked_caption = $this->makeHashTagLinks($picture->caption);
-        }
-
-        $picture->category()->associate($category);
-
-        $picture->save();
-
-        flash('Success! Picture details updated','success');
-        return redirect()->back();
+        $responseMsg = 'Success! Picture Deleted.';
+        return response()->json([
+            "message"=>$responseMsg,
+           ],200);
     }
 
-    public function like($id){
+    public function toggleLike(Picture $picture){
         $user = Auth::user();
-        $picture = Picture::find($id);
 
-        if (!$picture)
-          return response('Error! Picture not found!',404);
+        if (!$picture->likes->contains('user_id',$user->id)) {
+            $like = new Like;
+            $like->user()->associate($user);
+            $like->likable()->associate($picture);
 
-        if ($picture->likes->contains('user_id',$user->id))
-          return response('Error! Picture already liked',400);
-
-        $like = new Like;
-        $like->user()->associate($user);
-        $like->picture()->associate($picture);
-
-        $like->save();
+            $like->save();
+        }
+        else {
+            $like = $picture->likes->where('user_id',$user->id)->first();
+            $like->delete();
+        }
 
         $picture->load('likes');
-        
-        return response()->json($picture->likes->count());
+
+        $responseMsg = 'Success! Reply sent.';
+        return response()->json([
+            "message"=>$responseMsg,
+            "data"=>$picture->likes],200);
     }
 
-    public function download($id){
+    public function sendReply(Request $request, Picture $picture)
+    {
+        $this->validate($request,[
+            'content' => 'required|string|max:150'
+        ]);
+
+        $reply = new Reply;
+        $reply->content = $request['content'];
+
+        $reply->replyable()->associate($picture);
+        $reply->user()->associate($request->user());
+        $reply->save();
+
+        $responseMsg = 'Success! Reply Sent.';
+        return response()->json([
+            "message"=>$responseMsg,
+            "data"=>$reply],200);
+    }
+
+    /*public function download($id){
         $picture = Picture::find($id);
         if (!$picture || !Storage::disk('public')->exists($picture->high_resolution)){
           flash('Error! Picture not found!');
@@ -139,9 +164,9 @@ class PicturesController extends Controller
         $picture->save();
 
         return response()->download(public_path().'/storage'.$picture->high_resolution);
-    }
+    }*/
 
-    public function view($pictureId){
+    /*public function view($pictureId){
         $picture = Picture::find($pictureId);
         if (!$picture)
           return response('Error! Picture not found!',404);
@@ -150,9 +175,9 @@ class PicturesController extends Controller
         $picture->save();
 
         return response('Success! Picture view event recorded!',200);
-    }
+    }*/
 
-    public function getHashTags($caption){
+    /*public function getHashTags($caption){
         $pattern = '/(^|[^a-z0-9_])#([a-z0-9_]+)/i';
         preg_match_all($pattern,$caption,$hashTags);
 
@@ -176,8 +201,5 @@ class PicturesController extends Controller
         } ,$description);
 
         return $parsedDescription;
-    }
-
-
-
+    }*/
 }

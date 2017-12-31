@@ -12,9 +12,12 @@
 */
 
 
-Auth::routes();
+/*Auth::routes();*/
 
 Route::get('/', 'PagesController@index')->name('index');
+/*Route::get('/api/user', 'APIAuthController@test');*/
+
+/*
 Route::get('/mesho', 'PagesController@mesho')->name('mesho');
 Route::get('/tags/{hashtag}', 'PagesController@showTagPictures')->name('showHashTagPictures');
 
@@ -80,4 +83,4 @@ Route::group(['prefix' => 'pictures'], function () {
   Route::get('/{pictureId}/like', ['as' => 'picture.like', 'middleware' => 'auth', 'uses' => 'PicturesController@like' ]);
   Route::get('/{pictureId}/download', ['as' => 'picture.download', 'uses' => 'PicturesController@download']);
   Route::get('/{pictureId}/view', ['as' => 'picture.view', 'uses' => 'PicturesController@view']);
-});
+});*/

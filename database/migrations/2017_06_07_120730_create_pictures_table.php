@@ -15,20 +15,12 @@ class CreatePicturesTable extends Migration
     {
         Schema::create('pictures', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('caption');
-            $table->longText('linked_caption');
-            $table->string('low_resolution');
-            $table->string('high_resolution');
-            $table->string('type');
-            $table->integer('views');
-            $table->integer('downloads');
-            $table->longText('hash_tags');
+            $table->string('path');
+            $table->string('url')->nullable();
             $table->integer('user_id')->unsigned();
-            $table->integer('category_id')->unsigned();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 

@@ -167,6 +167,8 @@ return [
         Laracasts\Flash\FlashServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         ConsoleTVs\Charts\ChartsServiceProvider::class,
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        Barryvdh\Cors\ServiceProvider::class,
 
 
         /*
@@ -236,6 +238,8 @@ return [
         'Image' => Intervention\Image\Facades\Image::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'Charts' => ConsoleTVs\Charts\Facades\Charts::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
 
 
     ],
