@@ -14,6 +14,7 @@ class CaptionsController extends Controller
 {
     public function getCaption(Caption $caption)
     {
+        $caption->load('picture');
         $responseMsg = "Success! Caption Found.";
         return response()->json([
             "message"=>$responseMsg,
@@ -23,6 +24,8 @@ class CaptionsController extends Controller
     public function getAllCaptions()
     {
         $captions = Caption::all();
+        $captions->load('picture');
+
         if ($captions->count() < 1)
             $responseMsg = "Warning! Captions not Found.";
         else
@@ -36,6 +39,8 @@ class CaptionsController extends Controller
     public function getRandomCaptions()
     {
         $captions = Caption::all();
+        $captions->load('picture');
+
         if ($captions->count() < 1)
             $responseMsg = "Warning! Captions not Found.";
         else
